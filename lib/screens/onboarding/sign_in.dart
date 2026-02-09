@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+import 'forgot_password.dart';
 import 'signup.dart';
 
 class SignIn extends StatelessWidget {
@@ -97,12 +98,20 @@ class SignIn extends StatelessWidget {
                       color: Color.fromRGBO(158, 158, 158, 1)),
                 ),
                 Spacer(),
-                Text(
-                  "Forgot Password?",
-                  style: TextStyle(
-                      color: Color.fromRGBO(36, 124, 255, 1),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400),
+                GestureDetector(
+                  onTap: ()=>{
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ForgotPassword()))
+                  },
+                  child: Text(
+                    "Forgot Password?",
+                    style: TextStyle(
+                        color: Color.fromRGBO(36, 124, 255, 1),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400),
+                  ),
                 ),
               ],
             ),
@@ -183,7 +192,7 @@ class SignIn extends StatelessWidget {
                 child: Image.asset("assets/apple.png"),
               ),
             ]),
-            SizedBox(height: 50),
+            SizedBox(height: 80),
             RichText(
               textAlign: TextAlign.center,
               text: const TextSpan(

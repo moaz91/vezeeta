@@ -3,8 +3,15 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'sign_in.dart';
 
-class SignUp extends StatelessWidget {
-  const SignUp({super.key});
+class MyProfile extends StatefulWidget {
+  const MyProfile({super.key});
+
+  @override
+  State<MyProfile> createState() => _MyProfileState();
+}
+
+class _MyProfileState extends State<MyProfile> {
+  final _dateController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -13,14 +20,14 @@ class SignUp extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(254, 255, 255, 1),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
+        padding: const EdgeInsets.symmetric(horizontal: 30,vertical: 50),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 100),
+            const SizedBox(height: 50),
 
             const Text(
-              "Create Account",
+              "Fill Your Profile",
               style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 30,
@@ -31,7 +38,7 @@ class SignUp extends StatelessWidget {
             const SizedBox(height: 10),
 
             const Text(
-              "Sign up now and start exploring all that our app has to offer. We're excited to welcome you to our community!",
+              "Please take a few minutes to fill out your profile with as much detail as possible.",
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
@@ -41,7 +48,6 @@ class SignUp extends StatelessWidget {
 
             const SizedBox(height: 50),
 
-            /// Email
             TextField(
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
@@ -69,12 +75,52 @@ class SignUp extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            /// Password
             TextField(
-              obscureText: true,
-              keyboardType: TextInputType.visiblePassword,
+              keyboardType: TextInputType.name,
               decoration: InputDecoration(
-                hintText: "Password",
+                hintText: "Full Name",
+                filled: true,
+                fillColor: const Color.fromRGBO(253, 253, 255, 1),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(
+                    color: Color.fromRGBO(194, 194, 194, 1),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(
+                    color: Color.fromRGBO(36, 124, 255, 1),
+                  ),
+                ),
+                hintStyle: const TextStyle(
+                  fontSize: 14,
+                  color: Color.fromRGBO(194, 194, 194, 1),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            TextField(
+              controller: _dateController,
+              readOnly: true,
+              onTap: () async {
+                final picked = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime.now(),
+                );
+                if (picked != null) {
+                  setState(() {
+                    _dateController.text = "${picked.day}/${picked.month}/${picked.year}";
+                  });
+                }
+              },
+              decoration: InputDecoration(
+                hintText: "Birthday",
+                suffixIcon: const Icon(Icons.calendar_today_outlined),
                 filled: true,
                 fillColor: const Color.fromRGBO(253, 253, 255, 1),
                 border: OutlineInputBorder(
@@ -152,9 +198,8 @@ class SignUp extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 20),
+            Spacer(),
 
-            /// Sign up button
             Container(
               width: screenWidth,
               height: 70,
@@ -164,108 +209,12 @@ class SignUp extends StatelessWidget {
               ),
               child: const Center(
                 child: Text(
-                  "Sign Up",
+                  "Submit",
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 18,
                     color: Colors.white,
                   ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            const Row(
-              children: [
-                Expanded(
-                  child: Divider(color: Color.fromRGBO(158, 158, 158, 1)),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Text(
-                    "Or sign up with",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Color.fromRGBO(158, 158, 158, 1),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Divider(color: Color.fromRGBO(158, 158, 158, 1)),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                socialIcon("assets/google.png"),
-                const SizedBox(width: 40),
-                socialIcon("assets/facebook.png"),
-                const SizedBox(width: 40),
-                socialIcon("assets/apple.png"),
-              ],
-            ),
-
-            const SizedBox(height: 50),
-            RichText(
-              textAlign: TextAlign.center,
-              text: const TextSpan(
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: Color.fromRGBO(158, 158, 158, 1)),
-                children: <TextSpan>[
-                  TextSpan(
-                    text: "By logging, you agree to our ",
-                  ),
-                  TextSpan(
-                      text: "Terms & Conditions",
-                      style: TextStyle(color: Colors.black)),
-                  TextSpan(
-                    text: " and ",
-                  ),
-                  TextSpan(
-                      text: "PrivacyPolicy",
-                      style: TextStyle(color: Colors.black)),
-                  TextSpan(
-                    text: ".",
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 25),
-            Center(
-              child: RichText(
-                text: TextSpan(
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: Color.fromRGBO(158, 158, 158, 1),
-                  ),
-                  children: [
-                    const TextSpan(text: "Already have an account? "),
-                    TextSpan(
-                      text: "Sign In",
-                      style: const TextStyle(
-                        color: Color.fromRGBO(36, 124, 255, 1),
-                        fontWeight: FontWeight.w600,
-                      ),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SignIn(),
-                            ),
-                          );
-                        },
-                    ),
-                  ],
                 ),
               ),
             ),
@@ -275,15 +224,21 @@ class SignUp extends StatelessWidget {
     );
   }
 
-  static Widget socialIcon(String asset) {
-    return Container(
-      width: 46,
-      height: 46,
-      decoration: BoxDecoration(
-        color: const Color.fromRGBO(245, 245, 245, 1),
-        borderRadius: BorderRadius.circular(100),
-      ),
-      child: Image.asset(asset),
-    );
+  @override
+  void dispose() {
+    _dateController.dispose();
+    super.dispose();
   }
+}
+
+Widget _socialIcon(String asset) {
+  return Container(
+    width: 46,
+    height: 46,
+    decoration: BoxDecoration(
+      color: const Color.fromRGBO(245, 245, 245, 1),
+      borderRadius: BorderRadius.circular(100),
+    ),
+    child: Image.asset(asset),
+  );
 }
