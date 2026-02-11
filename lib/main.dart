@@ -1,4 +1,4 @@
-import 'package:vezeeta/screens/onboarding/my_profile.dart';
+import 'package:vezeeta/screens/onboarding/fill_my_profile.dart';
 import 'package:vezeeta/screens/onboarding/splash_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyProfile(),
+      home: const FillMyProfile(),
     );
   }
 }

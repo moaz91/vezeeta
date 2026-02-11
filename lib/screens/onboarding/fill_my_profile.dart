@@ -1,17 +1,33 @@
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import 'sign_in.dart';
 
-class MyProfile extends StatefulWidget {
-  const MyProfile({super.key});
+class FillMyProfile extends StatefulWidget {
+  const FillMyProfile({super.key});
 
   @override
-  State<MyProfile> createState() => _MyProfileState();
+  State<FillMyProfile> createState() => _MyProfileState();
 }
 
-class _MyProfileState extends State<MyProfile> {
+class _MyProfileState extends State<FillMyProfile> {
   final _dateController = TextEditingController();
+  File? _image;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage() async {
+    final picked = await _picker.pickImage(
+      source: ImageSource.gallery,
+    );
+
+    if (picked != null) {
+      setState(() {
+        _image = File(picked.path);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,12 +36,11 @@ class _MyProfileState extends State<MyProfile> {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(254, 255, 255, 1),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30,vertical: 50),
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 50),
-
             const Text(
               "Fill Your Profile",
               style: TextStyle(
@@ -46,7 +61,69 @@ class _MyProfileState extends State<MyProfile> {
               ),
             ),
 
-            const SizedBox(height: 50),
+            SizedBox(height: 50),
+
+            /// Profile Avatar - Exactly as provided
+            Center(
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  // Main Circle Avatar
+                  Container(
+                    width: 160,
+                    height: 160,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xFFE0E0E0), // light grey background
+                    ),
+                    child: ClipOval(
+                      child: _image != null
+                          ? Image.file(
+                        _image!,
+                        fit: BoxFit.cover,
+                        width: 160,
+                        height: 160,
+                      )
+                          : const Icon(
+                        Icons.person,
+                        size: 80,
+                        color: Color(0xFFBDBDBD),
+                      ),
+                    ),
+                  ),
+
+                  // Edit Button
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: GestureDetector(
+                      onTap: _pickImage,
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              blurRadius: 6,
+                              color: Colors.black.withOpacity(0.15),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.edit,
+                          size: 20,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 40),
 
             TextField(
               keyboardType: TextInputType.emailAddress,
@@ -166,7 +243,7 @@ class _MyProfileState extends State<MyProfile> {
                       child: CountryCodePicker(
                         margin: EdgeInsets.zero,
                         flagWidth: 30,
-                        padding: EdgeInsets.only(left: 0, right: 0),
+                        padding: const EdgeInsets.only(left: 0, right: 0),
                         initialSelection: 'EG',
                         favorite: const ['+20', 'EG', '+966', 'SA'],
                         showFlag: true,
@@ -198,26 +275,32 @@ class _MyProfileState extends State<MyProfile> {
               ),
             ),
 
-            Spacer(),
+            const Spacer(),
 
-            Container(
-              width: screenWidth,
-              height: 70,
-              decoration: BoxDecoration(
-                color: const Color.fromRGBO(36, 124, 255, 1),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: const Center(
-                child: Text(
-                  "Submit",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18,
-                    color: Colors.white,
+            GestureDetector(
+              onTap: () {
+                // Handle submit
+              },
+              child: Container(
+                width: screenWidth,
+                height: 70,
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(36, 124, 255, 1),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Center(
+                  child: Text(
+                    "Submit",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
             ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -229,16 +312,4 @@ class _MyProfileState extends State<MyProfile> {
     _dateController.dispose();
     super.dispose();
   }
-}
-
-Widget _socialIcon(String asset) {
-  return Container(
-    width: 46,
-    height: 46,
-    decoration: BoxDecoration(
-      color: const Color.fromRGBO(245, 245, 245, 1),
-      borderRadius: BorderRadius.circular(100),
-    ),
-    child: Image.asset(asset),
-  );
 }
