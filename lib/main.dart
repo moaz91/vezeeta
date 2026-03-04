@@ -1,5 +1,6 @@
 import 'package:vezeeta/screens/home/homescreen.dart';
 import 'package:flutter/material.dart';
+import 'package:vezeeta/screens/onboarding/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const Homescreen(),
+      home: const SplashScreen(),
     );
   }
 }
