@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vezeeta/screens/home/recommendation_doctor_screen.dart';
+import 'package:vezeeta/ui/screens/home/recommendation_doctor_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});

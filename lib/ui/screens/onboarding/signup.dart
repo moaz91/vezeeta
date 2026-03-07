@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 import 'sign_in.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../logic/auth/auth_bloc.dart';
-import '../../logic/auth/auth_events.dart';
-import '../../logic/auth/auth_states.dart';
-import '../home/homescreen.dart';
+import '../../../logic/auth/auth_bloc.dart';
+import '../../../logic/auth/auth_events.dart';
+import '../../../logic/auth/auth_states.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});

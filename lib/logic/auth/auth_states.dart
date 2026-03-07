@@ -15,7 +15,7 @@ class AuthLoading extends AuthState {}
 class AuthLoaded extends AuthState {
   final AuthModel authModel;
 
-  AuthLoaded(this.authModel);
+  const AuthLoaded(this.authModel);
 
   @override
   List<Object?> get props => [authModel];
@@ -24,7 +24,7 @@ class AuthLoaded extends AuthState {
 class AuthError extends AuthState {
   final String message;
 
-  AuthError(this.message);
+  const AuthError(this.message);
 
   @override
   List<Object?> get props => [message];

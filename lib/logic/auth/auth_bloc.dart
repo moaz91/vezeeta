@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'auth_events.dart';
 import 'auth_states.dart';
 import '../../models/auth_model.dart';
@@ -27,6 +28,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         if (response.statusCode == 200) {
 
           final authModel = AuthModel.fromJson(response.data);
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', authModel.token);
 
           emit(AuthLoaded(authModel));
 

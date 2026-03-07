@@ -1,14 +1,13 @@
-import 'dart:ui';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../logic/auth/auth_events.dart';
+import '../../../logic/auth/auth_events.dart';
 import '../home/homescreen.dart';
 
-import '../../logic/auth/auth_bloc.dart';
-import '../../logic/auth/auth_states.dart';
+import '../../../logic/auth/auth_bloc.dart';
+import '../../../logic/auth/auth_states.dart';
 import 'forgot_password.dart';
 import 'signup.dart';
 
@@ -37,8 +36,6 @@ class _SignInState extends State<SignIn> {
       create: (context) => AuthBloc(Dio()),
       child: BlocConsumer<AuthBloc, AuthState>(
 
-        // listener: runs side effects (navigation, snackbars)
-        // called every time state changes but does NOT rebuild UI
         listener: (context, state) {
           if (state is AuthLoaded) {
             Navigator.pushReplacement(
@@ -52,8 +49,6 @@ class _SignInState extends State<SignIn> {
           }
         },
 
-        // builder: rebuilds the UI based on state
-        // called every time state changes
         builder: (context, state) {
           if (state is AuthLoading) {
             return Center(child: CircularProgressIndicator());

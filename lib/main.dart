@@ -1,6 +1,5 @@
-import 'package:vezeeta/screens/home/homescreen.dart';
 import 'package:flutter/material.dart';
-import 'package:vezeeta/screens/onboarding/splash_screen.dart';
+import 'package:vezeeta/ui/screens/onboarding/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());

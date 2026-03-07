@@ -1,8 +1,10 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
-import 'package:vezeeta/screens/home/doctor_speciality_screen.dart';
-import 'package:vezeeta/screens/home/notifications.dart';
-import 'package:vezeeta/screens/home/recommendation_doctor_screen.dart';
-import 'package:vezeeta/screens/home/search_screen.dart';
+import 'package:vezeeta/ui/screens/home/doctor_speciality_screen.dart';
+import 'package:vezeeta/ui/screens/home/notifications.dart';
+import 'package:vezeeta/ui/screens/home/recommendation_doctor_screen.dart';
+import 'package:vezeeta/ui/screens/home/search_screen.dart';
 
 class SpecialityModel {
   final String label;
