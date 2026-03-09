@@ -6,6 +6,8 @@ import 'package:vezeeta/ui/screens/home/notifications.dart';
 import 'package:vezeeta/ui/screens/home/recommendation_doctor_screen.dart';
 import 'package:vezeeta/ui/screens/home/search_screen.dart';
 
+import '../../widgets/recommendation_doctor_widget.dart';
+
 class SpecialityModel {
   final String label;
   final String image;
@@ -410,90 +412,7 @@ class _HomeBody extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: allDoctors.length > 3 ? 3 : allDoctors.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 20),
-                itemBuilder: (context, index) {
-                  final doc = allDoctors[index];
-                  return SizedBox(
-                    height: 126,
-                    width: double.infinity,
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 110,
-                          height: 110,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Image.asset(doc.image),
-                        ),
-                        const SizedBox(width: 20),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Spacer(),
-                              Text(doc.name,
-                                  style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.black)),
-                              const SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  Text(doc.speciality,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 12,
-                                          color: Color.fromRGBO(117, 117, 117, 1))),
-                                  const SizedBox(width: 5),
-                                  Text("|",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 12,
-                                          color: Color.fromRGBO(117, 117, 117, 1))),
-                                  const SizedBox(width: 5),
-                                  Expanded(
-                                    child: Text(doc.hospital,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 12,
-                                            color: Color.fromRGBO(117, 117, 117, 1))),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  const Icon(Icons.star,
-                                      color: Color.fromRGBO(255, 203, 0, 1), size: 18),
-                                  const SizedBox(width: 5),
-                                  Text(doc.rating.toString(),
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color.fromRGBO(66, 66, 66, 1))),
-                                  const SizedBox(width: 5),
-                                  Text("(${_formatReviews(doc.reviews)} reviews)",
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color.fromRGBO(66, 66, 66, 1))),
-                                ],
-                              ),
-                              const Spacer(),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+              RecommendationDoctorWidget(count: 10),
 
               const SizedBox(height: 30),
             ],

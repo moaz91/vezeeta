@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../models/doctor_model.dart';
 
 class ReviewModel {
   final String name;
@@ -24,7 +25,9 @@ class WorkExperienceModel {
 }
 
 class DoctorDetails extends StatefulWidget {
-  const DoctorDetails({super.key});
+  final Doctor doctor;
+
+  const DoctorDetails({super.key, required this.doctor});
 
   @override
   State<DoctorDetails> createState() => _DoctorDetailsState();
@@ -34,7 +37,8 @@ class _DoctorDetailsState extends State<DoctorDetails>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  final String doctorName = "Dr. Randy Wigham";
+  String get doctorName => widget.doctor.name;
+
   final String doctorSpeciality = "General";
   final String doctorHospital = "RSUD Gatot Subroto";
   final double doctorRating = 4.8;
@@ -50,7 +54,7 @@ class _DoctorDetailsState extends State<DoctorDetails>
 
   final List<WorkExperienceModel> experiences = [
     WorkExperienceModel(hospital: "RSPAD Gatot Soebroto", period: "2017 - sekarang"),
-    WorkExperienceModel(hospital: "RS Siloam Jakarta",    period: "2013 - 2017"),
+    WorkExperienceModel(hospital: "RS Siloam Jakarta", period: "2013 - 2017"),
   ];
 
   final List<ReviewModel> reviews = [
@@ -110,7 +114,7 @@ class _DoctorDetailsState extends State<DoctorDetails>
             margin: const EdgeInsets.only(left: 16),
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border.all(color: Color.fromRGBO(237, 237, 237, 1)),
+              border: Border.all(color: const Color.fromRGBO(237, 237, 237, 1)),
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(Icons.chevron_left, color: Colors.black),
@@ -128,11 +132,13 @@ class _DoctorDetailsState extends State<DoctorDetails>
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                border: Border.all(width: 1, color: Color.fromRGBO(237, 237, 237, 1)),
+                border: Border.all(
+                    width: 1,
+                    color: const Color.fromRGBO(237, 237, 237, 1)),
                 borderRadius: BorderRadius.circular(10),
               ),
               padding: const EdgeInsets.all(8),
-              child: Icon(Icons.more_horiz, color: Colors.black),
+              child: const Icon(Icons.more_horiz, color: Colors.black),
             ),
           ),
         ],
@@ -140,7 +146,8 @@ class _DoctorDetailsState extends State<DoctorDetails>
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            padding:
+            const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Row(
               children: [
                 ClipRRect(
@@ -167,7 +174,7 @@ class _DoctorDetailsState extends State<DoctorDetails>
                       const SizedBox(height: 4),
                       Text(
                         "$doctorSpeciality  |  $doctorHospital",
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w400,
                             color: Color.fromRGBO(117, 117, 117, 1)),
@@ -176,11 +183,12 @@ class _DoctorDetailsState extends State<DoctorDetails>
                       Row(
                         children: [
                           const Icon(Icons.star,
-                              color: Color.fromRGBO(255, 203, 0, 1), size: 16),
+                              color: Color.fromRGBO(255, 203, 0, 1),
+                              size: 16),
                           const SizedBox(width: 4),
                           Text(
                             "$doctorRating (${_formatReviews(doctorReviews)} reviews)",
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
                                 color: Color.fromRGBO(66, 66, 66, 1)),
@@ -194,10 +202,10 @@ class _DoctorDetailsState extends State<DoctorDetails>
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Color.fromRGBO(232, 243, 255, 1),
+                    color: const Color.fromRGBO(232, 243, 255, 1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(Icons.chat_bubble_outline,
+                  child: const Icon(Icons.chat_bubble_outline,
                       color: Color.fromRGBO(36, 124, 255, 1), size: 20),
                 ),
               ],
@@ -205,13 +213,13 @@ class _DoctorDetailsState extends State<DoctorDetails>
           ),
           TabBar(
             controller: _tabController,
-            labelColor: Color.fromRGBO(36, 124, 255, 1),
-            unselectedLabelColor: Color.fromRGBO(117, 117, 117, 1),
-            labelStyle:
-            const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-            unselectedLabelStyle:
-            const TextStyle(fontWeight: FontWeight.w400, fontSize: 14),
-            indicatorColor: Color.fromRGBO(36, 124, 255, 1),
+            labelColor: const Color.fromRGBO(36, 124, 255, 1),
+            unselectedLabelColor: const Color.fromRGBO(117, 117, 117, 1),
+            labelStyle: const TextStyle(
+                fontWeight: FontWeight.w600, fontSize: 14),
+            unselectedLabelStyle: const TextStyle(
+                fontWeight: FontWeight.w400, fontSize: 14),
+            indicatorColor: const Color.fromRGBO(36, 124, 255, 1),
             indicatorWeight: 2,
             tabs: const [
               Tab(text: "About"),
@@ -240,7 +248,7 @@ class _DoctorDetailsState extends State<DoctorDetails>
           child: ElevatedButton(
             onPressed: () {},
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color.fromRGBO(36, 124, 255, 1),
+              backgroundColor: const Color.fromRGBO(36, 124, 255, 1),
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
@@ -248,7 +256,8 @@ class _DoctorDetailsState extends State<DoctorDetails>
             ),
             child: const Text(
               "Make An Appointment",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              style:
+              TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
         ),
@@ -263,11 +272,14 @@ class _DoctorDetailsState extends State<DoctorDetails>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text("About me",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.black)),
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black)),
           const SizedBox(height: 8),
           Text(
             aboutMe,
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
                 color: Color.fromRGBO(97, 97, 97, 1),
@@ -275,29 +287,38 @@ class _DoctorDetailsState extends State<DoctorDetails>
           ),
           const SizedBox(height: 20),
           const Text("Working Time",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.black)),
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black)),
           const SizedBox(height: 8),
           Text(
             workingTime,
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
                 color: Color.fromRGBO(97, 97, 97, 1)),
           ),
           const SizedBox(height: 20),
           const Text("STR",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.black)),
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black)),
           const SizedBox(height: 8),
           Text(
             str,
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
                 color: Color.fromRGBO(97, 97, 97, 1)),
           ),
           const SizedBox(height: 20),
           const Text("Pengalaman Praktik",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.black)),
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black)),
           const SizedBox(height: 8),
           ...experiences.map((exp) => Padding(
             padding: const EdgeInsets.only(bottom: 4),
@@ -306,14 +327,14 @@ class _DoctorDetailsState extends State<DoctorDetails>
               children: [
                 Text(
                   exp.hospital,
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                       color: Color.fromRGBO(97, 97, 97, 1)),
                 ),
                 Text(
                   exp.period,
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
                       color: Color.fromRGBO(150, 150, 150, 1)),
@@ -334,25 +355,31 @@ class _DoctorDetailsState extends State<DoctorDetails>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text("Practice Place",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.black)),
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black)),
           const SizedBox(height: 8),
           Text(
             practicePlace,
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
                 color: Color.fromRGBO(97, 97, 97, 1)),
           ),
           const SizedBox(height: 20),
           const Text("Location Map",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.black)),
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black)),
           const SizedBox(height: 12),
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: Container(
               width: double.infinity,
               height: 220,
-              color: Color.fromRGBO(220, 230, 240, 1),
+              color: const Color.fromRGBO(220, 230, 240, 1),
               child: Stack(
                 children: [
                   Image.network(
@@ -361,17 +388,17 @@ class _DoctorDetailsState extends State<DoctorDetails>
                     height: 220,
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => Container(
-                      color: Color.fromRGBO(224, 235, 248, 1),
+                      color: const Color.fromRGBO(224, 235, 248, 1),
                       child: Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.location_on,
+                            const Icon(Icons.location_on,
                                 color: Colors.red, size: 40),
                             const SizedBox(height: 8),
                             Text(
                               practicePlace,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
                                   color: Color.fromRGBO(66, 66, 66, 1)),
@@ -423,7 +450,7 @@ class _DoctorDetailsState extends State<DoctorDetails>
                 ),
                 Text(
                   review.date,
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontSize: 12,
                       color: Color.fromRGBO(150, 150, 150, 1)),
                 ),
@@ -437,15 +464,15 @@ class _DoctorDetailsState extends State<DoctorDetails>
                   Icons.star,
                   size: 18,
                   color: i < review.stars
-                      ? Color.fromRGBO(255, 203, 0, 1)
-                      : Color.fromRGBO(220, 220, 220, 1),
+                      ? const Color.fromRGBO(255, 203, 0, 1)
+                      : const Color.fromRGBO(220, 220, 220, 1),
                 ),
               ),
             ),
             const SizedBox(height: 8),
             Text(
               review.comment,
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w400,
                   color: Color.fromRGBO(97, 97, 97, 1),
