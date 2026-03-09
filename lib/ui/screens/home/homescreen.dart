@@ -5,7 +5,6 @@ import 'package:vezeeta/ui/screens/home/doctor_speciality_screen.dart';
 import 'package:vezeeta/ui/screens/home/notifications.dart';
 import 'package:vezeeta/ui/screens/home/recommendation_doctor_screen.dart';
 import 'package:vezeeta/ui/screens/home/search_screen.dart';
-
 import '../../widgets/recommendation_doctor_widget.dart';
 
 class SpecialityModel {
@@ -184,11 +183,6 @@ class _PlaceholderPage extends StatelessWidget {
 
 class _HomeBody extends StatelessWidget {
   const _HomeBody();
-
-  String _formatReviews(int reviews) {
-    if (reviews >= 1000) return "${(reviews / 1000).toStringAsFixed(1)}k";
-    return reviews.toString();
-  }
 
   @override
   Widget build(BuildContext context) {
