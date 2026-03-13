@@ -18,7 +18,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         final response = await dio.post(
           'https://vcare.integration25.com/api/auth/login',
-
           data: FormData.fromMap({
             'email': event.email,
             'password': event.password,
@@ -29,7 +28,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
           final authModel = AuthModel.fromJson(response.data);
           final prefs = await SharedPreferences.getInstance();
+
           await prefs.setString('token', authModel.token);
+
+          if (event.rememberMe) {
+            await prefs.setString('saved_email', event.email);
+            await prefs.setBool('remember_me', true);
+          } else {
+            await prefs.remove('saved_email');
+            await prefs.setBool('remember_me', false);
+          }
 
           emit(AuthLoaded(authModel));
 

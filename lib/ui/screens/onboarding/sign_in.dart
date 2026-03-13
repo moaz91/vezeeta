@@ -1,11 +1,10 @@
-
 import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../logic/auth/auth_events.dart';
 import '../home/homescreen.dart';
-
 import '../../../logic/auth/auth_bloc.dart';
 import '../../../logic/auth/auth_states.dart';
 import 'forgot_password.dart';
@@ -21,6 +20,25 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _rememberMe = false; // NEW: tracks checkbox state
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedEmail();
+  }
+
+  Future<void> _loadSavedEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    final rememberMe = prefs.getBool('remember_me') ?? false;
+    if (rememberMe) {
+      final savedEmail = prefs.getString('saved_email') ?? '';
+      setState(() {
+        _emailController.text = savedEmail;
+        _rememberMe = true;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -35,7 +53,6 @@ class _SignInState extends State<SignIn> {
     return BlocProvider(
       create: (context) => AuthBloc(Dio()),
       child: BlocConsumer<AuthBloc, AuthState>(
-
         listener: (context, state) {
           if (state is AuthLoaded) {
             Navigator.pushReplacement(
@@ -48,7 +65,6 @@ class _SignInState extends State<SignIn> {
             );
           }
         },
-
         builder: (context, state) {
           if (state is AuthLoading) {
             return Center(child: CircularProgressIndicator());
@@ -87,16 +103,17 @@ class _SignInState extends State<SignIn> {
                       fillColor: const Color.fromRGBO(253, 253, 255, 1),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide:
-                        const BorderSide(color: Color.fromRGBO(36, 124, 255, 1)),
+                        borderSide: const BorderSide(
+                            color: Color.fromRGBO(36, 124, 255, 1)),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide:
-                        const BorderSide(color: Color.fromRGBO(36, 124, 255, 1)),
+                        borderSide: const BorderSide(
+                            color: Color.fromRGBO(36, 124, 255, 1)),
                       ),
                       hintStyle: const TextStyle(
-                          fontSize: 14, color: Color.fromRGBO(194, 194, 194, 1)),
+                          fontSize: 14,
+                          color: Color.fromRGBO(194, 194, 194, 1)),
                     ),
                   ),
                   SizedBox(height: 20),
@@ -110,25 +127,29 @@ class _SignInState extends State<SignIn> {
                       fillColor: const Color.fromRGBO(253, 253, 255, 1),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide:
-                        const BorderSide(color: Color.fromRGBO(36, 124, 255, 1)),
+                        borderSide: const BorderSide(
+                            color: Color.fromRGBO(36, 124, 255, 1)),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide:
-                        const BorderSide(color: Color.fromRGBO(36, 124, 255, 1)),
+                        borderSide: const BorderSide(
+                            color: Color.fromRGBO(36, 124, 255, 1)),
                       ),
                       hintStyle: const TextStyle(
-                          fontSize: 14, color: Color.fromRGBO(194, 194, 194, 1)),
+                          fontSize: 14,
+                          color: Color.fromRGBO(194, 194, 194, 1)),
                     ),
                   ),
                   SizedBox(height: 20),
                   Row(
                     children: [
                       Checkbox(
-                        value: false,
-                        onChanged: (value) {},
-                        side: BorderSide(color: Color.fromRGBO(194, 194, 194, 1)),
+                        value: _rememberMe,
+                        onChanged: (value) {
+                          setState(() => _rememberMe = value!);
+                        },
+                        side: BorderSide(
+                            color: Color.fromRGBO(194, 194, 194, 1)),
                         activeColor: Color.fromRGBO(36, 124, 255, 1),
                       ),
                       Text(
@@ -163,6 +184,7 @@ class _SignInState extends State<SignIn> {
                         LoginEvent(
                           email: _emailController.text,
                           password: _passwordController.text,
+                          rememberMe: _rememberMe,
                         ),
                       );
                     },
@@ -207,34 +229,36 @@ class _SignInState extends State<SignIn> {
                     ],
                   ),
                   SizedBox(height: 20),
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Container(
-                      width: 46,
-                      height: 46,
-                      decoration: BoxDecoration(
-                          color: Color.fromRGBO(245, 245, 245, 1),
-                          borderRadius: BorderRadius.circular(100)),
-                      child: Image.asset("assets/google.png"),
-                    ),
-                    SizedBox(width: 40),
-                    Container(
-                      width: 46,
-                      height: 46,
-                      decoration: BoxDecoration(
-                          color: const Color.fromRGBO(245, 245, 245, 1),
-                          borderRadius: BorderRadius.circular(100)),
-                      child: Image.asset("assets/facebook.png"),
-                    ),
-                    const SizedBox(width: 40),
-                    Container(
-                      width: 46,
-                      height: 46,
-                      decoration: BoxDecoration(
-                          color: const Color.fromRGBO(245, 245, 245, 1),
-                          borderRadius: BorderRadius.circular(100)),
-                      child: Image.asset("assets/apple.png"),
-                    ),
-                  ]),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 46,
+                          height: 46,
+                          decoration: BoxDecoration(
+                              color: Color.fromRGBO(245, 245, 245, 1),
+                              borderRadius: BorderRadius.circular(100)),
+                          child: Image.asset("assets/google.png"),
+                        ),
+                        SizedBox(width: 40),
+                        Container(
+                          width: 46,
+                          height: 46,
+                          decoration: BoxDecoration(
+                              color: const Color.fromRGBO(245, 245, 245, 1),
+                              borderRadius: BorderRadius.circular(100)),
+                          child: Image.asset("assets/facebook.png"),
+                        ),
+                        const SizedBox(width: 40),
+                        Container(
+                          width: 46,
+                          height: 46,
+                          decoration: BoxDecoration(
+                              color: const Color.fromRGBO(245, 245, 245, 1),
+                              borderRadius: BorderRadius.circular(100)),
+                          child: Image.asset("assets/apple.png"),
+                        ),
+                      ]),
                   SizedBox(height: 80),
                   RichText(
                     textAlign: TextAlign.center,
@@ -244,21 +268,15 @@ class _SignInState extends State<SignIn> {
                           fontWeight: FontWeight.w400,
                           color: Color.fromRGBO(158, 158, 158, 1)),
                       children: <TextSpan>[
-                        TextSpan(
-                          text: "By logging, you agree to our ",
-                        ),
+                        TextSpan(text: "By logging, you agree to our "),
                         TextSpan(
                             text: "Terms & Conditions",
                             style: TextStyle(color: Colors.black)),
-                        TextSpan(
-                          text: " and ",
-                        ),
+                        TextSpan(text: " and "),
                         TextSpan(
                             text: "PrivacyPolicy",
                             style: TextStyle(color: Colors.black)),
-                        TextSpan(
-                          text: ".",
-                        ),
+                        TextSpan(text: "."),
                       ],
                     ),
                   ),
@@ -284,7 +302,8 @@ class _SignInState extends State<SignIn> {
                                 ..onTap = () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => SignUp()),
+                                    MaterialPageRoute(
+                                        builder: (context) => SignUp()),
                                   );
                                 }),
                         ],
@@ -296,7 +315,7 @@ class _SignInState extends State<SignIn> {
             ),
           );
         },
-      )
+      ),
     );
   }
 }

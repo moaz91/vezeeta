@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vezeeta/ui/screens/home/homescreen.dart';
 import 'onboarding.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -12,12 +14,26 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 3), () {
+    _checkToken();
+  }
+
+  Future<void> _checkToken() async {
+    await Future.delayed(const Duration(seconds: 3));
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+    final rememberMe = prefs.getBool('remember_me') ?? false;
+
+    if (token.isNotEmpty && rememberMe) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Onboarding()),
+        MaterialPageRoute(builder: (_) => const Homescreen()),
       );
-    });
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const Onboarding()),
+      );
+    }
   }
 
   @override
