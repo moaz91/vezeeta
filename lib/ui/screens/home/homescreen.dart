@@ -406,7 +406,7 @@ class _HomeBody extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              RecommendationDoctorWidget(count: 10),
+              RecommendationDoctorWidget(count: 3),
 
               const SizedBox(height: 30),
             ],
