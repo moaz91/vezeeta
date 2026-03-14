@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../models/doctor_model.dart';
+import '../appointment/book_appointment_screen.dart';
 
+// Reviews and WorkExperience stay static — not in the API
 class ReviewModel {
   final String name;
   final String avatar;
@@ -20,7 +22,6 @@ class ReviewModel {
 class WorkExperienceModel {
   final String hospital;
   final String period;
-
   WorkExperienceModel({required this.hospital, required this.period});
 }
 
@@ -37,33 +38,47 @@ class _DoctorDetailsState extends State<DoctorDetails>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
+  // ── All data comes from widget.doctor ──────────────────────────────────────
+
+  // AppBar and header
   String get doctorName => widget.doctor.name;
 
-  final String doctorSpeciality = "General";
-  final String doctorHospital = "RSUD Gatot Subroto";
-  final double doctorRating = 4.8;
-  final int doctorReviews = 4279;
-  final String doctorImage = "assets/rec.png";
+  // Specialization name from the nested object
+  String get doctorSpeciality => widget.doctor.specialization.name;
 
-  final String aboutMe =
-      "Dr. Jenny Watson is the top most Immunologists specialist in Christ Hospital at London. She achieved several awards for her wonderful contribution in medical field. She is available for private consultation.";
+  // Address from the API
+  String get doctorAddress => widget.doctor.address;
 
-  final String workingTime = "Monday - Friday, 08.00 AM - 20.00 PM";
-  final String str = "4726482464";
-  final String practicePlace = "Cairo, Egypt";
+  // City + Governrate as practice place
+  String get practicePlace =>
+      "${widget.doctor.city.name}, ${widget.doctor.city.governrate.name}";
 
-  final List<WorkExperienceModel> experiences = [
-    WorkExperienceModel(hospital: "RSPAD Gatot Soebroto", period: "2017 - sekarang"),
-    WorkExperienceModel(hospital: "RS Siloam Jakarta", period: "2013 - 2017"),
-  ];
+  // Description from API
+  String get aboutMe => widget.doctor.description.isNotEmpty
+      ? widget.doctor.description
+      : "No description available.";
 
+  // Working time built from start_time and end_time
+  String get workingTime =>
+      "${widget.doctor.startTime} - ${widget.doctor.endTime}";
+
+  // Degree used where STR/credential was shown
+  String get degree => widget.doctor.degree;
+
+  // Appointment price
+  int get appointPrice => widget.doctor.appointPrice;
+
+  // Doctor photo — network image with asset fallback
+  String get photoUrl => widget.doctor.photo;
+
+  // Static reviews — not in API
   final List<ReviewModel> reviews = [
     ReviewModel(
       name: "Jane Cooper",
       avatar: "assets/rec.png",
       stars: 5,
       comment:
-      "As someone who lives in a remote area with limited access to healthcare, this telemedicine app has been a game changer for me. I can easily schedule virtual appointments with doctors and get the care I need without having to travel long distances.",
+          "As someone who lives in a remote area with limited access to healthcare, this telemedicine app has been a game changer for me.",
       date: "Today",
     ),
     ReviewModel(
@@ -71,7 +86,7 @@ class _DoctorDetailsState extends State<DoctorDetails>
       avatar: "assets/rec.png",
       stars: 5,
       comment:
-      "I was initially skeptical about using a telemedicine app but this app has exceeded my expectations. The doctors are highly qualified and provide excellent care.",
+          "I was initially skeptical about using a telemedicine app but this app has exceeded my expectations. The doctors are highly qualified.",
       date: "Today",
     ),
     ReviewModel(
@@ -79,9 +94,15 @@ class _DoctorDetailsState extends State<DoctorDetails>
       avatar: "assets/rec.png",
       stars: 5,
       comment:
-      "Great experience! The doctor was very attentive and professional. Highly recommend this service to everyone.",
+          "Great experience! The doctor was very attentive and professional. Highly recommend this service.",
       date: "Today",
     ),
+  ];
+
+  // Static work experience — not in API
+  final List<WorkExperienceModel> experiences = [
+    WorkExperienceModel(hospital: "City Medical Center", period: "2019 - Present"),
+    WorkExperienceModel(hospital: "General Hospital", period: "2015 - 2019"),
   ];
 
   @override
@@ -94,11 +115,6 @@ class _DoctorDetailsState extends State<DoctorDetails>
   void dispose() {
     _tabController.dispose();
     super.dispose();
-  }
-
-  String _formatReviews(int count) {
-    if (count >= 1000) return "${(count / 1000).toStringAsFixed(1)}k";
-    return count.toString();
   }
 
   @override
@@ -114,7 +130,8 @@ class _DoctorDetailsState extends State<DoctorDetails>
             margin: const EdgeInsets.only(left: 16),
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border.all(color: const Color.fromRGBO(237, 237, 237, 1)),
+              border:
+                  Border.all(color: const Color.fromRGBO(237, 237, 237, 1)),
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(Icons.chevron_left, color: Colors.black),
@@ -147,16 +164,26 @@ class _DoctorDetailsState extends State<DoctorDetails>
         children: [
           Padding(
             padding:
-            const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Row(
               children: [
+                // ── Doctor photo — network with fallback ──────────────────
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    doctorImage,
+                  child: Image.network(
+                    photoUrl,
                     width: 72,
                     height: 72,
                     fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      width: 72,
+                      height: 72,
+                      decoration: BoxDecoration(
+                        color: const Color.fromRGBO(244, 248, 255, 1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.person, size: 40),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -164,6 +191,7 @@ class _DoctorDetailsState extends State<DoctorDetails>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Doctor name
                       Text(
                         doctorName,
                         style: const TextStyle(
@@ -172,22 +200,24 @@ class _DoctorDetailsState extends State<DoctorDetails>
                             color: Colors.black),
                       ),
                       const SizedBox(height: 4),
+                      // Specialization | City
                       Text(
-                        "$doctorSpeciality  |  $doctorHospital",
+                        "$doctorSpeciality  |  ${widget.doctor.city.name}",
                         style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w400,
                             color: Color.fromRGBO(117, 117, 117, 1)),
                       ),
                       const SizedBox(height: 6),
+                      // Degree + Appointment price
                       Row(
                         children: [
-                          const Icon(Icons.star,
-                              color: Color.fromRGBO(255, 203, 0, 1),
-                              size: 16),
+                          const Icon(Icons.medical_services_outlined,
+                              color: Color.fromRGBO(36, 124, 255, 1),
+                              size: 14),
                           const SizedBox(width: 4),
                           Text(
-                            "$doctorRating (${_formatReviews(doctorReviews)} reviews)",
+                            "$degree  •  \$$appointPrice / visit",
                             style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
@@ -211,14 +241,16 @@ class _DoctorDetailsState extends State<DoctorDetails>
               ],
             ),
           ),
+
+          // ── Tab bar ───────────────────────────────────────────────────────
           TabBar(
             controller: _tabController,
             labelColor: const Color.fromRGBO(36, 124, 255, 1),
             unselectedLabelColor: const Color.fromRGBO(117, 117, 117, 1),
-            labelStyle: const TextStyle(
-                fontWeight: FontWeight.w600, fontSize: 14),
-            unselectedLabelStyle: const TextStyle(
-                fontWeight: FontWeight.w400, fontSize: 14),
+            labelStyle:
+                const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            unselectedLabelStyle:
+                const TextStyle(fontWeight: FontWeight.w400, fontSize: 14),
             indicatorColor: const Color.fromRGBO(36, 124, 255, 1),
             indicatorWeight: 2,
             tabs: const [
@@ -228,6 +260,7 @@ class _DoctorDetailsState extends State<DoctorDetails>
             ],
           ),
           const Divider(height: 1, color: Color(0xFFEEEEEE)),
+
           Expanded(
             child: TabBarView(
               controller: _tabController,
@@ -246,7 +279,15 @@ class _DoctorDetailsState extends State<DoctorDetails>
           width: double.infinity,
           height: 54,
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      BookAppointmentScreen(doctor: widget.doctor),
+                ),
+              );
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color.fromRGBO(36, 124, 255, 1),
               foregroundColor: Colors.white,
@@ -256,8 +297,7 @@ class _DoctorDetailsState extends State<DoctorDetails>
             ),
             child: const Text(
               "Make An Appointment",
-              style:
-              TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
         ),
@@ -265,12 +305,14 @@ class _DoctorDetailsState extends State<DoctorDetails>
     );
   }
 
+  // ── About tab — uses API data ─────────────────────────────────────────────
   Widget _buildAboutTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // About me — from doctor.description
           const Text("About me",
               style: TextStyle(
                   fontSize: 16,
@@ -286,6 +328,8 @@ class _DoctorDetailsState extends State<DoctorDetails>
                 height: 1.6),
           ),
           const SizedBox(height: 20),
+
+          // Working time — from doctor.startTime + endTime
           const Text("Working Time",
               style: TextStyle(
                   fontSize: 16,
@@ -300,60 +344,94 @@ class _DoctorDetailsState extends State<DoctorDetails>
                 color: Color.fromRGBO(97, 97, 97, 1)),
           ),
           const SizedBox(height: 20),
-          const Text("STR",
+
+          // Degree — from doctor.degree
+          const Text("Degree",
               style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: Colors.black)),
           const SizedBox(height: 8),
           Text(
-            str,
+            degree,
             style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
                 color: Color.fromRGBO(97, 97, 97, 1)),
           ),
           const SizedBox(height: 20),
-          const Text("Pengalaman Praktik",
+
+          // Appointment price — from doctor.appointPrice
+          const Text("Appointment Price",
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black)),
+          const SizedBox(height: 8),
+          Text(
+            "\$$appointPrice",
+            style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: Color.fromRGBO(97, 97, 97, 1)),
+          ),
+          const SizedBox(height: 20),
+
+          // Work experience — static (not in API)
+          const Text("Work Experience",
               style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: Colors.black)),
           const SizedBox(height: 8),
           ...experiences.map((exp) => Padding(
-            padding: const EdgeInsets.only(bottom: 4),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  exp.hospital,
-                  style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: Color.fromRGBO(97, 97, 97, 1)),
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(exp.hospital,
+                        style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Color.fromRGBO(97, 97, 97, 1))),
+                    Text(exp.period,
+                        style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: Color.fromRGBO(150, 150, 150, 1))),
+                  ],
                 ),
-                Text(
-                  exp.period,
-                  style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: Color.fromRGBO(150, 150, 150, 1)),
-                ),
-                const SizedBox(height: 8),
-              ],
-            ),
-          )),
+              )),
         ],
       ),
     );
   }
 
+  // ── Location tab — uses city + governrate from API ────────────────────────
   Widget _buildLocationTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Full address from doctor.address
+          const Text("Address",
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black)),
+          const SizedBox(height: 8),
+          Text(
+            doctorAddress,
+            style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: Color.fromRGBO(97, 97, 97, 1),
+                height: 1.5),
+          ),
+          const SizedBox(height: 20),
+
+          // Practice place — city + governrate
           const Text("Practice Place",
               style: TextStyle(
                   fontSize: 16,
@@ -368,6 +446,7 @@ class _DoctorDetailsState extends State<DoctorDetails>
                 color: Color.fromRGBO(97, 97, 97, 1)),
           ),
           const SizedBox(height: 20),
+
           const Text("Location Map",
               style: TextStyle(
                   fontSize: 16,
@@ -379,36 +458,22 @@ class _DoctorDetailsState extends State<DoctorDetails>
             child: Container(
               width: double.infinity,
               height: 220,
-              color: const Color.fromRGBO(220, 230, 240, 1),
-              child: Stack(
-                children: [
-                  Image.network(
-                    "https://maps.googleapis.com/maps/api/staticmap?center=Cairo,Egypt&zoom=14&size=600x300&maptype=roadmap&markers=color:red%7CCairo,Egypt&key=YOUR_KEY",
-                    width: double.infinity,
-                    height: 220,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: const Color.fromRGBO(224, 235, 248, 1),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.location_on,
-                                color: Colors.red, size: 40),
-                            const SizedBox(height: 8),
-                            Text(
-                              practicePlace,
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color.fromRGBO(66, 66, 66, 1)),
-                            ),
-                          ],
-                        ),
-                      ),
+              color: const Color.fromRGBO(224, 235, 248, 1),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.location_on, color: Colors.red, size: 40),
+                    const SizedBox(height: 8),
+                    Text(
+                      practicePlace,
+                      style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Color.fromRGBO(66, 66, 66, 1)),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -417,6 +482,7 @@ class _DoctorDetailsState extends State<DoctorDetails>
     );
   }
 
+  // ── Reviews tab — static data ─────────────────────────────────────────────
   Widget _buildReviewsTab() {
     return ListView.separated(
       padding: const EdgeInsets.all(20),
@@ -440,27 +506,23 @@ class _DoctorDetailsState extends State<DoctorDetails>
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    review.name,
+                  child: Text(review.name,
+                      style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black)),
+                ),
+                Text(review.date,
                     style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black),
-                  ),
-                ),
-                Text(
-                  review.date,
-                  style: const TextStyle(
-                      fontSize: 12,
-                      color: Color.fromRGBO(150, 150, 150, 1)),
-                ),
+                        fontSize: 12,
+                        color: Color.fromRGBO(150, 150, 150, 1))),
               ],
             ),
             const SizedBox(height: 8),
             Row(
               children: List.generate(
                 5,
-                    (i) => Icon(
+                (i) => Icon(
                   Icons.star,
                   size: 18,
                   color: i < review.stars
