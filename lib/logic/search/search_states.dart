@@ -15,7 +15,7 @@ class SearchLoading extends SearchState {}
 class SearchLoaded extends SearchState {
   final List<Doctor> doctors;
 
-  SearchLoaded(this.doctors);
+  const SearchLoaded(this.doctors);
 
   @override
   List<Object?> get props => [doctors];
@@ -24,7 +24,7 @@ class SearchLoaded extends SearchState {
 class SearchError extends SearchState {
   final String message;
 
-  SearchError(this.message);
+  const SearchError(this.message);
 
   @override
   List<Object?> get props => [message];

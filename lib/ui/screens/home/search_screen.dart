@@ -86,7 +86,7 @@ class _SearchScreenState extends State<SearchScreen> {
     );
     if (result != null) {
       setState(() {
-        _selectedSpeciality = result['speciality']!;
+        _selectedSpeciality = result['specialization']!;
       });
     }
   }
@@ -120,11 +120,11 @@ class _SearchScreenState extends State<SearchScreen> {
                   ...state.doctors
                       .map((d) => d.specialization.name)
                       .toSet()
-                      .toList()
+
                 ]
                     : ['All'];
 
-                // filter locally by speciality
+                // filter locally by specialization
                 final doctors = state is SearchLoaded
                     ? state.doctors.where((doc) {
                   return _selectedSpeciality == 'All' ||
@@ -557,7 +557,7 @@ class _FilterSheetState extends State<_FilterSheet> {
             height: 54,
             child: ElevatedButton(
               onPressed: () => Navigator.pop(context, {
-                'speciality': selectedSpeciality,
+                'specialization': selectedSpeciality,
               }),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF2979FF),

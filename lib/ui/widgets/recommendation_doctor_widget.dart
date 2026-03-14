@@ -11,10 +11,6 @@ class RecommendationDoctorWidget extends StatelessWidget {
 
   const RecommendationDoctorWidget({super.key, required this.count});
 
-  String _formatReviews(int reviews) {
-    if (reviews >= 1000) return "${(reviews / 1000).toStringAsFixed(1)}k";
-    return reviews.toString();
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -79,7 +79,7 @@ class _RecommendationDoctorScreenState
     );
     if (result != null) {
       setState(() {
-        _selectedSpeciality = result['speciality']!;
+        _selectedSpeciality = result['specialization']!;
         _selectedRating = result['rating']!;
       });
     }
@@ -455,7 +455,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             height: 54,
             child: ElevatedButton(
               onPressed: () => Navigator.pop(context, {
-                'speciality': selectedSpeciality,
+                'specialization': selectedSpeciality,
                 'rating': selectedRating,
               }),
               style: ElevatedButton.styleFrom(
