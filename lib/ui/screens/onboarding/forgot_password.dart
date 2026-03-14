@@ -1,6 +1,4 @@
-import 'dart:ui';
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 
@@ -10,7 +8,6 @@ class ForgotPassword extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Color.fromRGBO(254, 255, 255, 1),
       body: Padding(

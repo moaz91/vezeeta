@@ -1,4 +1,4 @@
-import 'package:vezeeta/screens/onboarding/sign_in.dart';
+import 'package:vezeeta/ui/screens/onboarding/sign_in.dart';
 import 'package:flutter/material.dart';
 
 class Onboarding extends StatelessWidget {

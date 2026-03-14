@@ -1,9 +1,9 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:country_code_picker/country_code_picker.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'sign_in.dart';
 
 class FillMyProfile extends StatefulWidget {
   const FillMyProfile({super.key});

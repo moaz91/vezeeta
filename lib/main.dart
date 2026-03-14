@@ -1,6 +1,5 @@
-import 'package:vezeeta/screens/onboarding/fill_my_profile.dart';
-import 'package:vezeeta/screens/onboarding/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:vezeeta/ui/screens/onboarding/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,15 +8,15 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Vezeeta',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const FillMyProfile(),
+      home: const SplashScreen(),
     );
   }
 }
