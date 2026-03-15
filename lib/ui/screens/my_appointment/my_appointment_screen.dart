@@ -1,55 +1,11 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:vezeeta/ui/screens/my_appointment/reschedule_screen.dart';
-
-class AppointmentUIModel {
-  final String doctorName;
-  final String doctorImage;
-  final String specialty;
-  final String date;
-  final String time;
-  final double rating;
-  final int reviews;
-
-  AppointmentUIModel({
-    required this.doctorName,
-    required this.doctorImage,
-    required this.specialty,
-    required this.date,
-    required this.time,
-    required this.rating,
-    required this.reviews,
-  });
-}
-
-final List<AppointmentUIModel> _appointments = [
-  AppointmentUIModel(
-    doctorName: "Dr. Randy Wigham",
-    doctorImage: "assets/rec.png",
-    specialty: "General Medical Checkup",
-    date: "Wed, 17 May",
-    time: "08.30 AM",
-    rating: 4.8,
-    reviews: 4279,
-  ),
-  AppointmentUIModel(
-    doctorName: "Dr. Jack Sulivan",
-    doctorImage: "assets/rec.png",
-    specialty: "General Medical Checkup",
-    date: "Wed, 17 May",
-    time: "08.30 AM",
-    rating: 4.8,
-    reviews: 4279,
-  ),
-  AppointmentUIModel(
-    doctorName: "Drg. Hanna Stanton",
-    doctorImage: "assets/rec.png",
-    specialty: "General Medical Checkup",
-    date: "Wed, 17 May",
-    time: "08.30 AM",
-    rating: 4.8,
-    reviews: 4279,
-  ),
-];
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../logic/appointment/appointment_bloc.dart';
+import '../../../logic/appointment/appointment_events.dart';
+import '../../../logic/appointment/appointment_states.dart';
+import '../../../models/appointment_model.dart';
+import 'reschedule_screen.dart';
 
 class MyAppointmentScreen extends StatefulWidget {
   const MyAppointmentScreen({super.key});
@@ -74,118 +30,177 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen>
     super.dispose();
   }
 
-  String _formatReviews(int count) {
-    if (count >= 1000) return "${(count / 1000).toStringAsFixed(1)}k";
-    return count.toString();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: const Icon(Icons.chevron_left, color: Colors.black, size: 28),
+    return BlocProvider(
+      // Fetch appointments when screen opens
+      create: (_) => AppointmentBloc(Dio())..add(FetchAppointments()),
+      child: Scaffold(
+        backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: const Icon(Icons.chevron_left,
+                color: Colors.black, size: 28),
+          ),
+          title: const Text("My Appointment",
+              style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                  color: Colors.black)),
+          centerTitle: true,
+          actions: [
+            const Padding(
+              padding: EdgeInsets.only(right: 16),
+              child: Icon(Icons.search, color: Colors.black, size: 24),
+            ),
+          ],
         ),
-        title: const Text("My Appointment",
-            style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 18,
-                color: Colors.black)),
-        centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: const Icon(Icons.search, color: Colors.black, size: 24),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Container(
-            color: Colors.white,
-            child: TabBar(
-              controller: _tabController,
-              labelColor: const Color.fromRGBO(36, 124, 255, 1),
-              unselectedLabelColor: const Color.fromRGBO(150, 150, 150, 1),
-              labelStyle: const TextStyle(
-                  fontWeight: FontWeight.w600, fontSize: 14),
-              unselectedLabelStyle: const TextStyle(
-                  fontWeight: FontWeight.w400, fontSize: 14),
-              indicatorColor: const Color.fromRGBO(36, 124, 255, 1),
-              indicatorWeight: 2,
-              tabs: const [
-                Tab(text: "Upcoming"),
-                Tab(text: "Completed"),
-                Tab(text: "Cancelled"),
-              ],
+        body: Column(
+          children: [
+            Container(
+              color: Colors.white,
+              child: TabBar(
+                controller: _tabController,
+                labelColor: const Color.fromRGBO(36, 124, 255, 1),
+                unselectedLabelColor:
+                    const Color.fromRGBO(150, 150, 150, 1),
+                labelStyle: const TextStyle(
+                    fontWeight: FontWeight.w600, fontSize: 14),
+                unselectedLabelStyle: const TextStyle(
+                    fontWeight: FontWeight.w400, fontSize: 14),
+                indicatorColor: const Color.fromRGBO(36, 124, 255, 1),
+                indicatorWeight: 2,
+                tabs: const [
+                  Tab(text: "Upcoming"),
+                  Tab(text: "Completed"),
+                  Tab(text: "Cancelled"),
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildUpcomingTab(),
-                _buildStatusTab(isCompleted: true),
-                _buildStatusTab(isCompleted: false),
-              ],
+            Expanded(
+              child: BlocBuilder<AppointmentBloc, AppointmentState>(
+                builder: (context, state) {
+                  if (state is AppointmentLoading ||
+                      state is AppointmentInitial) {
+                    return const Center(
+                        child: CircularProgressIndicator());
+                  }
+
+                  if (state is AppointmentError) {
+                    return Center(
+                      child: Text(state.message,
+                          style: const TextStyle(color: Colors.red)),
+                    );
+                  }
+
+                  if (state is AppointmentsLoaded) {
+                    // Filter by status for each tab
+                    // API status values: "pending" = upcoming, "completed", "cancelled"
+                    final upcoming = state.appointments
+                        .where((a) => a.isPending)
+                        .toList();
+                    final completed = state.appointments
+                        .where((a) => a.isCompleted)
+                        .toList();
+                    final cancelled = state.appointments
+                        .where((a) => a.isCancelled)
+                        .toList();
+
+                    return TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildUpcomingTab(upcoming),
+                        _buildStatusTab(completed, isCompleted: true),
+                        _buildStatusTab(cancelled, isCompleted: false),
+                      ],
+                    );
+                  }
+
+                  return TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _emptyState("No upcoming appointments"),
+                      _emptyState("No completed appointments"),
+                      _emptyState("No cancelled appointments"),
+                    ],
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   // ── Upcoming tab ──────────────────────────────────────────────────────────
-  Widget _buildUpcomingTab() {
+  Widget _buildUpcomingTab(List<AppointmentModel> appointments) {
+    if (appointments.isEmpty) {
+      return _emptyState("No upcoming appointments");
+    }
+
     return ListView.separated(
       padding: const EdgeInsets.all(20),
-      itemCount: _appointments.length,
+      itemCount: appointments.length,
       separatorBuilder: (_, __) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
-        final apt = _appointments[index];
+        final apt = appointments[index];
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border:
-            Border.all(color: const Color.fromRGBO(237, 237, 237, 1)),
+            border: Border.all(
+                color: const Color.fromRGBO(237, 237, 237, 1)),
           ),
           child: Column(
             children: [
               Row(
                 children: [
+                  // Doctor photo
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
-                    child: Image.asset(apt.doctorImage,
-                        width: 56, height: 56, fit: BoxFit.cover),
+                    child: Image.network(
+                      apt.doctor.photo,
+                      width: 56,
+                      height: 56,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        width: 56,
+                        height: 56,
+                        color:
+                            const Color.fromRGBO(244, 248, 255, 1),
+                        child:
+                            const Icon(Icons.person, size: 28),
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(apt.doctorName,
+                        Text(apt.doctor.name,
                             style: const TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.black)),
                         const SizedBox(height: 4),
-                        Text(apt.specialty,
+                        // Notes = appointment type (In Person, Video Call etc)
+                        Text(apt.notes,
                             style: const TextStyle(
                                 fontSize: 12,
-                                color:
-                                Color.fromRGBO(117, 117, 117, 1))),
+                                color: Color.fromRGBO(
+                                    117, 117, 117, 1))),
                         const SizedBox(height: 4),
-                        Text("${apt.date}  |  ${apt.time}",
+                        Text(apt.appointmentTime,
                             style: const TextStyle(
                                 fontSize: 12,
-                                color:
-                                Color.fromRGBO(117, 117, 117, 1))),
+                                color: Color.fromRGBO(
+                                    117, 117, 117, 1))),
                       ],
                     ),
                   ),
@@ -193,11 +208,13 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen>
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: const Color.fromRGBO(232, 243, 255, 1),
+                      color:
+                          const Color.fromRGBO(232, 243, 255, 1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(Icons.chat_bubble_outline,
-                        color: Color.fromRGBO(36, 124, 255, 1), size: 18),
+                        color: Color.fromRGBO(36, 124, 255, 1),
+                        size: 18),
                   ),
                 ],
               ),
@@ -213,15 +230,17 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen>
                         side: const BorderSide(
                             color: Color.fromRGBO(36, 124, 255, 1)),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        padding:
-                        const EdgeInsets.symmetric(vertical: 12),
+                            borderRadius:
+                                BorderRadius.circular(10)),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12),
                       ),
                       child: const Text("Cancel Appointment",
                           style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
-                              color: Color.fromRGBO(36, 124, 255, 1))),
+                              color: Color.fromRGBO(
+                                  36, 124, 255, 1))),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -231,18 +250,20 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const RescheduleScreen()),
+                              builder: (_) =>
+                                  const RescheduleScreen()),
                         );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
-                        const Color.fromRGBO(36, 124, 255, 1),
+                            const Color.fromRGBO(36, 124, 255, 1),
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                            borderRadius:
+                                BorderRadius.circular(10)),
                         elevation: 0,
-                        padding:
-                        const EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12),
                       ),
                       child: const Text("Reschedule",
                           style: TextStyle(
@@ -259,38 +280,48 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen>
     );
   }
 
-  // ── Completed & Cancelled tabs — same structure, different label/color ────
-  Widget _buildStatusTab({required bool isCompleted}) {
+  // ── Completed & Cancelled tabs ────────────────────────────────────────────
+  Widget _buildStatusTab(
+      List<AppointmentModel> appointments,
+      {required bool isCompleted}) {
+    if (appointments.isEmpty) {
+      return _emptyState(isCompleted
+          ? "No completed appointments"
+          : "No cancelled appointments");
+    }
+
     final statusLabel =
-    isCompleted ? "Appointment done" : "Appointment cancelled";
+        isCompleted ? "Appointment done" : "Appointment cancelled";
     final statusColor = isCompleted
         ? const Color.fromRGBO(34, 197, 94, 1)
         : const Color.fromRGBO(239, 68, 68, 1);
 
     return ListView.separated(
       padding: const EdgeInsets.all(20),
-      itemCount: _appointments.length,
+      itemCount: appointments.length,
       separatorBuilder: (_, __) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
-        final apt = _appointments[index];
+        final apt = appointments[index];
         return Container(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border:
-            Border.all(color: const Color.fromRGBO(237, 237, 237, 1)),
+            border: Border.all(
+                color: const Color.fromRGBO(237, 237, 237, 1)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Status label + date/time + more icon — INSIDE container ──
+              // ── Status label + datetime + more icon (inside container) ──
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+                padding:
+                    const EdgeInsets.fromLTRB(16, 14, 12, 14),
                 child: Row(
                   children: [
                     Expanded(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start,
                         children: [
                           Text(statusLabel,
                               style: TextStyle(
@@ -298,45 +329,59 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen>
                                   fontWeight: FontWeight.w500,
                                   color: statusColor)),
                           const SizedBox(height: 4),
-                          Text("${apt.date}  |  ${apt.time}",
+                          Text(apt.appointmentTime,
                               style: const TextStyle(
                                   fontSize: 12,
-                                  color:
-                                  Color.fromRGBO(150, 150, 150, 1))),
+                                  color: Color.fromRGBO(
+                                      150, 150, 150, 1))),
                         ],
                       ),
                     ),
                     const Icon(Icons.more_vert,
-                        color: Color.fromRGBO(150, 150, 150, 1), size: 20),
+                        color: Color.fromRGBO(150, 150, 150, 1),
+                        size: 20),
                   ],
                 ),
               ),
 
-              // ── Horizontal divider ────────────────────────────────────
+              // ── Horizontal divider ──────────────────────────────────
               const Divider(height: 1, color: Color(0xFFEEEEEE)),
 
-              // ── Doctor info below the divider ─────────────────────────
+              // ── Doctor info ─────────────────────────────────────────
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Image.asset(apt.doctorImage,
-                          width: 64, height: 64, fit: BoxFit.cover),
+                      child: Image.network(
+                        apt.doctor.photo,
+                        width: 64,
+                        height: 64,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          width: 64,
+                          height: 64,
+                          color: const Color.fromRGBO(
+                              244, 248, 255, 1),
+                          child: const Icon(Icons.person,
+                              size: 32),
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 14),
                     Expanded(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start,
                         children: [
-                          Text(apt.doctorName,
+                          Text(apt.doctor.name,
                               style: const TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w700,
                                   color: Colors.black)),
                           const SizedBox(height: 4),
-                          Text(apt.specialty,
+                          Text(apt.doctor.specialization,
                               style: const TextStyle(
                                   fontSize: 12,
                                   color: Color.fromRGBO(
@@ -345,12 +390,11 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen>
                           Row(
                             children: [
                               const Icon(Icons.star,
-                                  color:
-                                  Color.fromRGBO(255, 203, 0, 1),
+                                  color: Color.fromRGBO(
+                                      255, 203, 0, 1),
                                   size: 14),
                               const SizedBox(width: 4),
-                              Text(
-                                  "${apt.rating} (${_formatReviews(apt.reviews)} reviews)",
+                              Text(apt.doctor.degree,
                                   style: const TextStyle(
                                       fontSize: 12,
                                       color: Color.fromRGBO(
@@ -369,5 +413,22 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen>
       },
     );
   }
-}
 
+  Widget _emptyState(String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.calendar_today_outlined,
+              size: 64, color: Colors.grey.shade300),
+          const SizedBox(height: 12),
+          Text(message,
+              style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey.shade400,
+                  fontWeight: FontWeight.w500)),
+        ],
+      ),
+    );
+  }
+}

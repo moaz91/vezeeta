@@ -1,9 +1,8 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:vezeeta/ui/screens/my_appointment/my_appointment_screen.dart';
+import 'package:vezeeta/ui/screens/profile/profile_screen.dart';
 import 'package:vezeeta/ui/screens/home/doctor_speciality_screen.dart';
 import 'package:vezeeta/ui/screens/home/notifications.dart';
 import 'package:vezeeta/ui/screens/home/recommendation_doctor_screen.dart';
@@ -13,7 +12,7 @@ import '../../widgets/recommendation_doctor_widget.dart';
 import '../../../logic/home/home_bloc.dart';
 import '../../../logic/home/home_events.dart';
 import '../../../logic/home/home_states.dart';
-
+import 'package:vezeeta/ui/screens/profile/profile_screen.dart';
 const Map<String, String> _icons = {
   'Cardiology':       'assets/heart.png',
   'Dermatology':      'assets/stomach.png',
@@ -56,7 +55,7 @@ class _HomeScreenState extends State<Homescreen> {
       case 2:
         return const MyAppointmentScreen();
       case 3:
-        return const _PlaceholderPage(label: "Profile");
+        return const ProfileScreen();
       default:
         return const _HomeBody();
     }
@@ -136,45 +135,45 @@ class _HomeScreenState extends State<Homescreen> {
         child: Center(
           child: isAvatar
               ? Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: const DecorationImage(
-                image: AssetImage("assets/rec.png"),
-                fit: BoxFit.cover,
-              ),
-              border: Border.all(
-                color: isActive
-                    ? const Color.fromRGBO(36, 124, 255, 1)
-                    : Colors.transparent,
-                width: 2,
-              ),
-            ),
-          )
-              : Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Icon(
-                isActive ? activeIcon : icon,
-                size: 26,
-                color: isActive
-                    ? const Color.fromRGBO(36, 124, 255, 1)
-                    : const Color.fromRGBO(180, 180, 180, 1),
-              ),
-              if (hasNotif)
-                Positioned(
-                  top: -2,
-                  right: -4,
-                  child: Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                        color: Colors.red, shape: BoxShape.circle),
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: const DecorationImage(
+                      image: AssetImage("assets/rec.png"),
+                      fit: BoxFit.cover,
+                    ),
+                    border: Border.all(
+                      color: isActive
+                          ? const Color.fromRGBO(36, 124, 255, 1)
+                          : Colors.transparent,
+                      width: 2,
+                    ),
                   ),
+                )
+              : Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Icon(
+                      isActive ? activeIcon : icon,
+                      size: 26,
+                      color: isActive
+                          ? const Color.fromRGBO(36, 124, 255, 1)
+                          : const Color.fromRGBO(180, 180, 180, 1),
+                    ),
+                    if (hasNotif)
+                      Positioned(
+                        top: -2,
+                        right: -4,
+                        child: Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                              color: Colors.red, shape: BoxShape.circle),
+                        ),
+                      ),
+                  ],
                 ),
-            ],
-          ),
         ),
       ),
     );
@@ -337,7 +336,7 @@ class _HomeBody extends StatelessWidget {
                       onTap: () => Navigator.push(context,
                           MaterialPageRoute(
                               builder: (_) =>
-                              const DoctorSpecialityScreen())),
+                                  const DoctorSpecialityScreen())),
                       child: const Text("See All",
                           style: TextStyle(
                               fontSize: 12,
@@ -381,7 +380,7 @@ class _HomeBody extends StatelessWidget {
                                   height: 56,
                                   decoration: BoxDecoration(
                                       borderRadius:
-                                      BorderRadius.circular(100),
+                                          BorderRadius.circular(100),
                                       color: const Color.fromRGBO(
                                           244, 248, 255, 1)),
                                   child: Image.asset(iconPath,
@@ -405,7 +404,7 @@ class _HomeBody extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: List.generate(
                         4,
-                            (_) => Container(
+                        (_) => Container(
                           width: 56,
                           height: 56,
                           decoration: BoxDecoration(
@@ -433,7 +432,7 @@ class _HomeBody extends StatelessWidget {
                       onTap: () => Navigator.push(context,
                           MaterialPageRoute(
                               builder: (_) =>
-                              const RecommendationDoctorScreen())),
+                                  const RecommendationDoctorScreen())),
                       child: const Text("See All",
                           style: TextStyle(
                               fontSize: 12,

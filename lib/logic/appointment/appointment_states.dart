@@ -7,21 +7,26 @@ abstract class AppointmentState extends Equatable {
   List<Object?> get props => [];
 }
 
-// Before the user submits anything
 class AppointmentInitial extends AppointmentState {}
 
-// While the API call is in progress — show loading on Book Now button
 class AppointmentLoading extends AppointmentState {}
 
-// Booking succeeded — navigate to confirmation screen
-class AppointmentSuccess extends AppointmentState {
+// Holds fetched list — filtered by status in the UI
+class AppointmentsLoaded extends AppointmentState {
+  final List<AppointmentModel> appointments;
+  const AppointmentsLoaded(this.appointments);
+  @override
+  List<Object?> get props => [appointments];
+}
+
+// Booking succeeded
+class AppointmentBooked extends AppointmentState {
   final AppointmentModel appointment;
-  const AppointmentSuccess(this.appointment);
+  const AppointmentBooked(this.appointment);
   @override
   List<Object?> get props => [appointment];
 }
 
-// Something went wrong
 class AppointmentError extends AppointmentState {
   final String message;
   const AppointmentError(this.message);

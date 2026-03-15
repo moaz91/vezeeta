@@ -5,9 +5,13 @@ abstract class AppointmentEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+// Fired when MyAppointmentScreen opens
+class FetchAppointments extends AppointmentEvent {}
+
+// Fired when user taps "Book Now" on summary screen
 class BookAppointment extends AppointmentEvent {
   final int doctorId;
-  final String startTime; // format: "2023-10-10 14:00"
+  final String startTime;
   final String notes;
 
   BookAppointment({

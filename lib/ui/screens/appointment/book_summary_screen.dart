@@ -52,7 +52,7 @@ class BookSummaryScreen extends StatelessWidget {
       create: (_) => AppointmentBloc(Dio()),
       child: BlocConsumer<AppointmentBloc, AppointmentState>(
         listener: (context, state) {
-          if (state is AppointmentSuccess) {
+          if (state is AppointmentBooked) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -148,7 +148,7 @@ class BookSummaryScreen extends StatelessWidget {
                               width: 56,
                               height: 56,
                               color:
-                              const Color.fromRGBO(244, 248, 255, 1),
+                                  const Color.fromRGBO(244, 248, 255, 1),
                               child: const Icon(Icons.person, size: 30),
                             ),
                           ),
@@ -270,17 +270,17 @@ class BookSummaryScreen extends StatelessWidget {
                   onPressed: isLoading
                       ? null
                       : () {
-                    context.read<AppointmentBloc>().add(
-                      BookAppointment(
-                        doctorId: doctor.id,
-                        startTime: _apiStartTime,
-                        notes: appointmentType,
-                      ),
-                    );
-                  },
+                          context.read<AppointmentBloc>().add(
+                                BookAppointment(
+                                  doctorId: doctor.id,
+                                  startTime: _apiStartTime,
+                                  notes: appointmentType,
+                                ),
+                              );
+                        },
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
-                    const Color.fromRGBO(36, 124, 255, 1),
+                        const Color.fromRGBO(36, 124, 255, 1),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16)),
@@ -288,15 +288,15 @@ class BookSummaryScreen extends StatelessWidget {
                   ),
                   child: isLoading
                       ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                        color: Colors.white, strokeWidth: 2),
-                  )
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                              color: Colors.white, strokeWidth: 2),
+                        )
                       : const Text("Book Now",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600)),
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600)),
                 ),
               ),
             ),
@@ -402,12 +402,12 @@ Widget _buildStepIndicator({required int currentStep}) {
               child: isDone
                   ? const Icon(Icons.check, color: Colors.white, size: 16)
                   : Text("${stepIndex + 1}",
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: isActive
-                          ? Colors.white
-                          : const Color.fromRGBO(150, 150, 150, 1))),
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: isActive
+                              ? Colors.white
+                              : const Color.fromRGBO(150, 150, 150, 1))),
             ),
           ),
           const SizedBox(height: 4),
@@ -415,7 +415,7 @@ Widget _buildStepIndicator({required int currentStep}) {
               style: TextStyle(
                   fontSize: 10,
                   fontWeight:
-                  isActive ? FontWeight.w600 : FontWeight.w400,
+                      isActive ? FontWeight.w600 : FontWeight.w400,
                   color: isActive
                       ? const Color.fromRGBO(36, 124, 255, 1)
                       : const Color.fromRGBO(150, 150, 150, 1))),
