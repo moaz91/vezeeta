@@ -77,7 +77,6 @@ class _LanguageScreenState extends State<LanguageScreen> {
                     const Divider(height: 1, color: Color(0xFFF2F2F2)),
                 itemBuilder: (context, index) {
                   final lang = _filtered[index];
-                  final isSelected = _selected == lang;
                   return GestureDetector(
                     onTap: () => setState(() => _selected = lang),
                     child: Padding(
