@@ -1,3 +1,4 @@
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,38 +19,40 @@ class PersonalInformationScreen extends StatefulWidget {
 
 class _PersonalInformationScreenState
     extends State<PersonalInformationScreen> {
-  late TextEditingController _nameController;
-  late TextEditingController _emailController;
-  late TextEditingController _phoneController;
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   String _selectedGender = '0';
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController =
-        TextEditingController(text: widget.user?.name ?? '');
-    _emailController =
-        TextEditingController(text: widget.user?.email ?? '');
-    _phoneController =
-        TextEditingController(text: widget.user?.phone ?? '');
-    _selectedGender = widget.user?.gender ?? '0';
-  }
+  bool _populated = false;
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
+    _passwordController.dispose();
     super.dispose();
+  }
+
+  void _populate(UserModel user) {
+    if (_populated) return;
+    _populated = true;
+    _nameController.text = user.name;
+    _emailController.text = user.email;
+    _phoneController.text = user.phone;
+    _selectedGender = user.gender;
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ProfileBloc(Dio()),
+      create: (_) => ProfileBloc(Dio())..add(FetchProfile()),
       child: BlocConsumer<ProfileBloc, ProfileState>(
         listener: (context, state) {
-          if (state is ProfileUpdated) {
+          if (state is ProfileLoaded) {
+            setState(() => _populate(state.user));
+          } else if (state is ProfileUpdated) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("Profile updated successfully")),
             );
@@ -61,7 +64,8 @@ class _PersonalInformationScreenState
           }
         },
         builder: (context, state) {
-          final isLoading = state is ProfileLoading;
+          final isFetching = state is ProfileLoading && !_populated;
+          final isSaving = state is ProfileLoading && _populated;
 
           return Scaffold(
             backgroundColor: Colors.white,
@@ -80,13 +84,15 @@ class _PersonalInformationScreenState
                       color: Colors.black)),
               centerTitle: true,
             ),
-            body: SingleChildScrollView(
+            body: isFetching
+                ? const Center(child: CircularProgressIndicator())
+                : SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 children: [
                   const SizedBox(height: 24),
 
-                  // ── Avatar ──────────────────────────────────────────────
+                  // ── Avatar ────────────────────────────────────────
                   Stack(
                     children: [
                       Container(
@@ -127,7 +133,7 @@ class _PersonalInformationScreenState
 
                   const SizedBox(height: 28),
 
-                  // ── Name ────────────────────────────────────────────────
+                  // ── Name ──────────────────────────────────────────
                   _field(
                     controller: _nameController,
                     hint: "Full Name",
@@ -135,7 +141,7 @@ class _PersonalInformationScreenState
                   ),
                   const SizedBox(height: 16),
 
-                  // ── Email ───────────────────────────────────────────────
+                  // ── Email ─────────────────────────────────────────
                   _field(
                     controller: _emailController,
                     hint: "Email",
@@ -143,36 +149,74 @@ class _PersonalInformationScreenState
                   ),
                   const SizedBox(height: 16),
 
-                  // ── Password placeholder ────────────────────────────────
+                  // ── Password ──────────────────────────────────────
                   _field(
-                    controller: TextEditingController(text: "Password"),
-                    hint: "Password",
+                    controller: _passwordController,
+                    hint: "New Password (leave blank to keep current)",
                     obscure: true,
-                    readOnly: true,
                   ),
                   const SizedBox(height: 16),
 
-                  // ── Phone ───────────────────────────────────────────────
-                  _field(
-                    controller: _phoneController,
-                    hint: "Phone",
-                    keyboardType: TextInputType.phone,
-                    prefix: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Text("🇬🇧",
-                            style: TextStyle(fontSize: 18)),
-                        SizedBox(width: 4),
-                        Icon(Icons.keyboard_arrow_down,
-                            size: 18,
-                            color: Color.fromRGBO(150, 150, 150, 1)),
-                        SizedBox(width: 8),
+                  // ── Phone with CountryCodePicker ──────────────────
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: const Color.fromRGBO(248, 250, 255, 1),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                          color: const Color.fromRGBO(220, 220, 220, 1)),
+                    ),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 135,
+                          child: Theme(
+                            data: Theme.of(context).copyWith(
+                              iconTheme:
+                              const IconThemeData(size: 16),
+                            ),
+                            child: CountryCodePicker(
+                              margin: EdgeInsets.zero,
+                              flagWidth: 30,
+                              padding: EdgeInsets.zero,
+                              initialSelection: 'EG',
+                              favorite: const [
+                                '+20', 'EG', '+966', 'SA'
+                              ],
+                              showFlag: true,
+                              showDropDownButton: true,
+                              onChanged: (_) {},
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 24,
+                          child: VerticalDivider(
+                            color: Color.fromRGBO(220, 220, 220, 1),
+                          ),
+                        ),
+                        Expanded(
+                          child: TextField(
+                            controller: _phoneController,
+                            keyboardType: TextInputType.phone,
+                            decoration: const InputDecoration(
+                              hintText: "Your number",
+                              border: InputBorder.none,
+                              hintStyle: TextStyle(
+                                fontSize: 14,
+                                color: Color.fromRGBO(180, 180, 180, 1),
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
+
                   const SizedBox(height: 24),
 
-                  // ── Info note ───────────────────────────────────────────
+                  // ── Info note ─────────────────────────────────────
                   const Text(
                     "When you set up your personal information settings, you should take care to provide accurate information.",
                     style: TextStyle(
@@ -191,37 +235,35 @@ class _PersonalInformationScreenState
                 width: double.infinity,
                 height: 54,
                 child: ElevatedButton(
-                  onPressed: isLoading
+                  onPressed: isFetching || isSaving
                       ? null
                       : () {
-                          context.read<ProfileBloc>().add(
-                                UpdateProfile(
-                                  name: _nameController.text,
-                                  email: _emailController.text,
-                                  phone: _phoneController.text,
-                                  gender: _selectedGender,
-                                ),
-                              );
-                        },
+                    context.read<ProfileBloc>().add(
+                      UpdateProfile(
+                        name: _nameController.text,
+                        email: _emailController.text,
+                        phone: _phoneController.text,
+                        gender: _selectedGender,
+                      ),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        const Color.fromRGBO(36, 124, 255, 1),
+                    backgroundColor: const Color.fromRGBO(36, 124, 255, 1),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16)),
                     elevation: 0,
                   ),
-                  child: isLoading
+                  child: isSaving
                       ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                              color: Colors.white, strokeWidth: 2),
-                        )
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                        color: Colors.white, strokeWidth: 2),
+                  )
                       : const Text("Save",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600)),
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600)),
                 ),
               ),
             ),
@@ -236,41 +278,31 @@ class _PersonalInformationScreenState
     required String hint,
     TextInputType? keyboardType,
     bool obscure = false,
-    bool readOnly = false,
-    Widget? prefix,
   }) {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
       obscureText: obscure,
-      readOnly: readOnly,
       decoration: InputDecoration(
         hintText: hint,
-        prefixIcon: prefix != null
-            ? Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: prefix)
-            : null,
-        prefixIconConstraints:
-            prefix != null ? const BoxConstraints() : null,
         filled: true,
         fillColor: const Color.fromRGBO(248, 250, 255, 1),
-        contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16, vertical: 16),
+        contentPadding:
+        const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide:
-              const BorderSide(color: Color.fromRGBO(220, 220, 220, 1)),
+          const BorderSide(color: Color.fromRGBO(220, 220, 220, 1)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide:
-              const BorderSide(color: Color.fromRGBO(220, 220, 220, 1)),
+          const BorderSide(color: Color.fromRGBO(220, 220, 220, 1)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(
-              color: Color.fromRGBO(36, 124, 255, 1)),
+          borderSide:
+          const BorderSide(color: Color.fromRGBO(36, 124, 255, 1)),
         ),
         hintStyle: const TextStyle(
             fontSize: 14, color: Color.fromRGBO(180, 180, 180, 1)),

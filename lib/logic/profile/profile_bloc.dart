@@ -10,7 +10,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
   ProfileBloc(this.dio) : super(ProfileInitial()) {
 
-    // ── Fetch profile ───────────────────────────────────────────────────────
     on<FetchProfile>((event, emit) async {
       emit(ProfileLoading());
       try {
@@ -33,7 +32,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       }
     });
 
-    // ── Update profile ──────────────────────────────────────────────────────
     on<UpdateProfile>((event, emit) async {
       emit(ProfileLoading());
       try {
@@ -62,7 +60,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       }
     });
 
-    // ── Logout ──────────────────────────────────────────────────────────────
     on<LogoutEvent>((event, emit) async {
       emit(ProfileLoading());
       try {
@@ -74,14 +71,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           options: Options(headers: {'Authorization': 'Bearer $token'}),
         );
 
-        // Clear saved token and remember me flag regardless of response
         await prefs.remove('token');
         await prefs.remove('saved_email');
         await prefs.setBool('remember_me', false);
 
         emit(ProfileLoggedOut());
       } catch (e) {
-        // Even if API call fails, clear local token and log out
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove('token');
         await prefs.remove('saved_email');

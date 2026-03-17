@@ -11,7 +11,6 @@ class AppointmentInitial extends AppointmentState {}
 
 class AppointmentLoading extends AppointmentState {}
 
-// Holds fetched list — filtered by status in the UI
 class AppointmentsLoaded extends AppointmentState {
   final List<AppointmentModel> appointments;
   const AppointmentsLoaded(this.appointments);
@@ -19,7 +18,6 @@ class AppointmentsLoaded extends AppointmentState {
   List<Object?> get props => [appointments];
 }
 
-// Booking succeeded
 class AppointmentBooked extends AppointmentState {
   final AppointmentModel appointment;
   const AppointmentBooked(this.appointment);

@@ -10,7 +10,6 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
 
   AppointmentBloc(this.dio) : super(AppointmentInitial()) {
 
-    // ── Fetch all appointments ──────────────────────────────────────────────
     on<FetchAppointments>((event, emit) async {
       emit(AppointmentLoading());
       try {
@@ -23,7 +22,6 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
         );
 
         if (response.statusCode == 200) {
-          // API returns: { data: [ {...}, {...} ] }
           final List<AppointmentModel> appointments =
               List<AppointmentModel>.from(
             (response.data['data'] ?? [])
@@ -38,7 +36,6 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
       }
     });
 
-    // ── Book new appointment ────────────────────────────────────────────────
     on<BookAppointment>((event, emit) async {
       emit(AppointmentLoading());
       try {
