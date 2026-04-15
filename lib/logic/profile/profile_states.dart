@@ -18,7 +18,6 @@ class ProfileLoaded extends ProfileState {
   List<Object?> get props => [user];
 }
 
-// After successful update
 class ProfileUpdated extends ProfileState {
   final UserModel user;
   const ProfileUpdated(this.user);
@@ -26,7 +25,6 @@ class ProfileUpdated extends ProfileState {
   List<Object?> get props => [user];
 }
 
-// After successful logout — navigate to onboarding
 class ProfileLoggedOut extends ProfileState {}
 
 class ProfileError extends ProfileState {

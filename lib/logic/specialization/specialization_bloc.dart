@@ -16,7 +16,6 @@ class SpecializationBloc
         final prefs = await SharedPreferences.getInstance();
         final token = prefs.getString('token') ?? '';
 
-        // GET /specialization/index — returns ALL specializations (not random 5)
         final response = await dio.get(
           'https://vcare.integration25.com/api/specialization/index',
           options: Options(headers: {'Authorization': 'Bearer $token'}),

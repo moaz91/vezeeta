@@ -11,7 +11,6 @@ class SpecializationInitial extends SpecializationState {}
 
 class SpecializationLoading extends SpecializationState {}
 
-// Holds the full list of all specializations
 class SpecializationLoaded extends SpecializationState {
   final List<SpecializationItem> specializations;
   const SpecializationLoaded(this.specializations);

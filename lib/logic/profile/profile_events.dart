@@ -5,10 +5,8 @@ abstract class ProfileEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-// Fired when profile screen opens
 class FetchProfile extends ProfileEvent {}
 
-// Fired when user taps Save on personal information screen
 class UpdateProfile extends ProfileEvent {
   final String name;
   final String email;
@@ -26,5 +24,4 @@ class UpdateProfile extends ProfileEvent {
   List<Object?> get props => [name, email, phone, gender];
 }
 
-// Fired when user confirms logout
 class LogoutEvent extends ProfileEvent {}

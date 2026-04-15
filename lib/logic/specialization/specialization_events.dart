@@ -5,5 +5,4 @@ abstract class SpecializationEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-// Fired when DoctorSpecialityScreen opens — fetches all from /specialization/index
 class FetchAllSpecializations extends SpecializationEvent {}
