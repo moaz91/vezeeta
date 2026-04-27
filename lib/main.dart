@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:vezeeta/ui/screens/onboarding/splash_screen.dart';
+import 'package:vezeeta/core/cache/cache_helper.dart';
+import 'package:vezeeta/features/auth/ui/splash_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await CacheHelper.init();
   runApp(const MyApp());
 }
 
